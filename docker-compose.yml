@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  lottery-prediction:
+    build: .
+    container_name: lottery-xsmb
+    restart: always
+    ports:
+      - "6868:6868"
+    environment:
+      - NODE_ENV=production
+      - PORT=6868
+      - TZ=Asia/Ho_Chi_Minh
+      # VPS AI Config
+      - VPS_AI_BASE_URL=http://194.233.66.68:8317/v1
+      - VPS_AI_API_KEY=candat
+      - DEFAULT_AI_MODEL=gemini-claude-opus-4-5-thinking
+    volumes:
+      # Lưu dữ liệu lịch sử xổ số
+      - lottery-data:/app/server/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:6868/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  lottery-data:
+    driver: local

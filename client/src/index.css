@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/* Custom styles for lottery app */
+:root {
+  --color-primary: #dc2626;
+  --color-secondary: #f59e0b;
+  --color-gold: #fbbf24;
+  --color-dark: #1f2937;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  min-height: 100vh;
+  margin: 0;
+}
+
+#root {
+  width: 100%;
+}
+
+/* Number ball styles */
+.number-ball {
+  @apply w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-lg;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.number-ball.hot {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  animation: pulse-hot 2s infinite;
+}
+
+.number-ball.cold {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.number-ball.special {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1f2937;
+}
+
+@keyframes pulse-hot {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+  }
+}
+
+/* Card styles */
+.card {
+  @apply bg-gray-800 rounded-xl shadow-xl border border-gray-700 overflow-hidden;
+}
+
+.card-header {
+  @apply bg-gradient-to-r from-red-600 to-red-700 px-4 py-3 text-white font-semibold;
+}
+
+.card-body {
+  @apply p-4;
+}
+
+/* Table styles */
+.lottery-table {
+  @apply w-full text-sm;
+}
+
+.lottery-table th {
+  @apply bg-gray-700 text-gray-300 font-semibold py-2 px-3 text-left;
+}
+
+.lottery-table td {
+  @apply py-2 px-3 border-b border-gray-700 text-gray-300;
+}
+
+/* Prize styles */
+.prize-special {
+  @apply text-2xl font-bold text-yellow-400;
+}
+
+.prize-first {
+  @apply text-xl font-bold text-red-400;
+}
+
+/* Loading spinner */
+.spinner {
+  @apply w-8 h-8 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin;
+}
+
+/* Analysis section */
+.analysis-content {
+  @apply text-gray-300 leading-relaxed;
+}
+
+.analysis-content h1 {
+  @apply text-xl font-bold text-yellow-400 mt-6 mb-3;
+}
+
+.analysis-content h2 {
+  @apply text-lg font-bold text-yellow-400 mt-5 mb-2;
+}
+
+.analysis-content h3 {
+  @apply text-base font-semibold text-yellow-300 mt-4 mb-2;
+}
+
+.analysis-content ul {
+  @apply list-disc pl-5 space-y-1 my-2;
+}
+
+.analysis-content ol {
+  @apply list-decimal pl-5 space-y-1 my-2;
+}
+
+.analysis-content strong {
+  @apply text-yellow-300;
+}
+
+.analysis-content p {
+  @apply my-2;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-600 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* Button styles */
+.btn {
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200 cursor-pointer;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-500 hover:to-red-600;
+}
+
+.btn-secondary {
+  @apply bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 hover:from-yellow-400 hover:to-yellow-500;
+}
+
+.btn-outline {
+  @apply border-2 border-gray-600 text-gray-300 hover:border-yellow-500 hover:text-yellow-500;
+}

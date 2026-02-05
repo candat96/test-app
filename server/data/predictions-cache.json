@@ -1,0 +1,48 @@
+{
+  "2026-02-05": {
+    "gemini": {
+      "provider": "vps-ai",
+      "model": "Gemini 3 Pro Preview",
+      "modelId": "gemini-3-pro-preview",
+      "modelKey": "gemini",
+      "analysis": "### 🎯 3 CẶP SỐ DỰ ĐOÁN HÔM NAY (Thứ Năm, 5 tháng 2, 2026):\n\n**1. Lô [94]** - [Lô nóng (13 lần), trùng khớp cầu Đuôi 4 đang vượng, cặp 54-94 có tín hiệu báo về]\n\n**2. Lô [47]** - [Đầu 4 và Đuôi 7 đều nằm trong top dữ liệu nóng, xuất hiện bù cho chuỗi đuôi 7 vừa ra]\n\n**3. Lô [60]** - [Thuộc top lô xuất hiện nhiều (13 lần), Đầu 6 đang dẫn đầu bảng tần suất, dễ rơi lại]\n\n### 📊 Đầu đuôi gợi ý:\n- Đầu: [4, 6, 9]\n- Đuôi: [0, 4, 7]\n\n### 📈 Độ tin cậy: [85]%",
+      "predictionDate": "2026-02-05",
+      "predictionDateDisplay": "Thứ Năm, 5 tháng 2, 2026",
+      "timestamp": "2026-02-05T09:00:31.761Z",
+      "fromCache": false
+    },
+    "claude-sonnet": {
+      "provider": "vps-ai",
+      "model": "Claude Sonnet 4.5 Thinking",
+      "modelId": "gemini-claude-sonnet-4-5-thinking",
+      "modelKey": "claude-sonnet",
+      "analysis": "# 🎯 DỰ ĐOÁN XỔ SỐ MIỀN BẮC\n\n## Thứ Năm, 5 tháng 2, 2026\n\n---\n\n### 🎯 3 CẶP SỐ DỰ ĐOÁN HÔM NAY:\n\n**1. Lô 26** - Gan 15 ngày, chu kỳ hồi quy mạnh, kết hợp đầu 2 và đuôi 6 đang hoạt động\n\n**2. Lô 44** - Xuất hiện 11 lần (nóng), đầu 4 - đuôi 4 cực mạnh, vừa về ngày 04/02 tạo đà tiếp diễn\n\n**3. Lô 94** - Tần suất cao 13 lần, cặp 54-94 và 93-94 liên kết mạnh, đuôi 4 đang bùng nổ\n\n---\n\n### 📊 Đầu đuôi gợi ý:\n- **Đầu: 4, 2, 9**\n- **Đuôi: 4, 6, 7**\n\n### 📈 Độ tin cậy: **78%**\n\n---\n\n💡 *Phân tích dựa trên: Cân bằng lô gan hồi quy (26), lô nóng duy trì đà (44, 94), và các cặp số có liên kết thống kê cao trong 30 ngày qua.*",
+      "predictionDate": "2026-02-05",
+      "predictionDateDisplay": "Thứ Năm, 5 tháng 2, 2026",
+      "timestamp": "2026-02-05T09:01:10.490Z",
+      "fromCache": false
+    },
+    "claude-opus": {
+      "provider": "vps-ai",
+      "model": "Claude Opus 4.5 Thinking",
+      "modelId": "gemini-claude-opus-4-5-thinking",
+      "modelKey": "claude-opus",
+      "analysis": "### 🎯 3 CẶP SỐ DỰ ĐOÁN HÔM NAY (Thứ Năm, 5 tháng 2, 2026):\n\n**1. Lô [26]** - Gan 15 ngày, đuôi 6 nóng, đầu 2 chuẩn bị chu kỳ về\n\n**2. Lô [50]** - Gan 15 ngày, đầu 5 kết hợp đuôi 0, xác suất phá gan cao\n\n**3. Lô [84]** - Gan 12 ngày, đầu 8 nóng, đuôi 4 đang hot nhất\n\n### 📊 Đầu đuôi gợi ý:\n- Đầu: **8**\n- Đuôi: **4**\n\n### 📈 Độ tin cậy: **68%**\n\n---\n⚠️ *Lưu ý: Xổ số là trò chơi may rủi, chỉ mang tính tham khảo.*",
+      "predictionDate": "2026-02-05",
+      "predictionDateDisplay": "Thứ Năm, 5 tháng 2, 2026",
+      "timestamp": "2026-02-05T09:05:03.755Z",
+      "fromCache": false
+    },
+    "gpt-codex-max": {
+      "provider": "vps-ai",
+      "model": "GPT 5.1 Codex Max",
+      "modelId": "gpt-5.1-codex-max",
+      "modelKey": "gpt-codex-max",
+      "analysis": "### 🎯 3 CẶP SỐ DỰ ĐOÁN HÔM NAY (Thứ Năm, 5 tháng 2, 2026):\n\n**1. Lô [39]** - Lô nóng 14 lần/30 ngày, hay đi kèm 88, đuôi 9 đang nóng.  \n**2. Lô [94]** - Top tần suất (13 lần), đuôi 4 nóng, có cặp 54-94 xuất hiện 7 lần.  \n**3. Lô [17]** - Lô nóng (12 lần), ra gần đây liên tục, có cặp 17-89 xuất hiện 6 lần.\n\n### 📊 Đầu đuôi gợi ý:\n- Đầu: 4  \n- Đuôi: 9\n\n### 📈 Độ tin cậy: 67%",
+      "predictionDate": "2026-02-05",
+      "predictionDateDisplay": "Thứ Năm, 5 tháng 2, 2026",
+      "timestamp": "2026-02-05T09:06:01.048Z",
+      "fromCache": false
+    }
+  }
+}
