@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Brain, Loader2, AlertCircle, Sparkles, Target, RefreshCw, CheckCircle } from 'lucide-react';
+import { Brain, Loader2, AlertCircle, Sparkles, Target, RefreshCw, CheckCircle, Trash2 } from 'lucide-react';
 import { useAIAnalysis } from '../hooks/useLottery';
 
 // Danh sách models VPS AI
@@ -14,7 +14,7 @@ const AI_MODELS = [
 ];
 
 export default function AIAnalysis({ hasData }) {
-  const { analysis, providers, loading, error, analyze } = useAIAnalysis();
+  const { analysis, providers, loading, error, analyze, clearAllAndReanalyze } = useAIAnalysis();
   const [selectedModel, setSelectedModel] = useState('claude-opus');
 
   const handleAnalyze = async () => {
@@ -22,6 +22,14 @@ export default function AIAnalysis({ hasData }) {
       await analyze(30, selectedModel);
     } catch (err) {
       console.error('Analysis failed:', err);
+    }
+  };
+
+  const handleClearAndReanalyze = async () => {
+    try {
+      await clearAllAndReanalyze(30, selectedModel);
+    } catch (err) {
+      console.error('Clear and reanalyze failed:', err);
     }
   };
 
@@ -87,7 +95,7 @@ export default function AIAnalysis({ hasData }) {
               })}
             </select>
           </div>
-          <div className="flex items-end">
+          <div className="flex items-end gap-2">
             <button
               onClick={handleAnalyze}
               disabled={loading || !hasData}
@@ -109,6 +117,15 @@ export default function AIAnalysis({ hasData }) {
                   Dự đoán
                 </>
               )}
+            </button>
+            <button
+              onClick={handleClearAndReanalyze}
+              disabled={loading || !hasData}
+              className="btn bg-red-600 hover:bg-red-700 text-white flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Xóa tất cả dự đoán và dự đoán lại"
+            >
+              <Trash2 className="w-4 h-4" />
+              Clear & Dự đoán lại
             </button>
           </div>
         </div>

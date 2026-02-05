@@ -46,6 +46,10 @@ const api = {
   // Lấy danh sách AI providers
   getAIProviders: () => axios.get(`${API_BASE}/ai-providers`),
   
+  // Xóa cache dự đoán
+  clearPredictionCache: (modelKey) => 
+    axios.post(`${API_BASE}/clear-prediction-cache`, { modelKey }),
+  
   // Import dữ liệu mẫu
   importSample: () => axios.post(`${API_BASE}/import-sample`)
 };

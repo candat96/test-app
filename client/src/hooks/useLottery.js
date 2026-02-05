@@ -133,6 +133,38 @@ export function useAIAnalysis() {
     }
   }, []);
 
+  const clearCache = useCallback(async (modelKey) => {
+    try {
+      await api.clearPredictionCache(modelKey);
+      await fetchProviders();
+    } catch (err) {
+      console.error('Failed to clear cache:', err);
+      throw err;
+    }
+  }, [fetchProviders]);
+
+  const clearAllAndReanalyze = useCallback(async (days = 30, provider = 'anthropic') => {
+    try {
+      setLoading(true);
+      setError(null);
+      // Clear tất cả cache
+      await api.clearPredictionCache(null);
+      // Dự đoán lại
+      const response = await api.getAIAnalysis(days, provider);
+      if (response.data.success) {
+        setAnalysis(response.data.data);
+      }
+      await fetchProviders();
+      return response.data;
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || err.message;
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchProviders]);
+
   useEffect(() => {
     fetchProviders();
   }, [fetchProviders]);
@@ -143,6 +175,8 @@ export function useAIAnalysis() {
     loading,
     error,
     analyze,
-    fetchProviders
+    fetchProviders,
+    clearCache,
+    clearAllAndReanalyze
   };
 }
