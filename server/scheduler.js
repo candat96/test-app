@@ -1,12 +1,14 @@
 const cron = require('node-cron');
 const lotteryService = require('./services/lotteryService');
 const crawlService = require('./services/crawlService');
+const aiService = require('./services/aiService');
 
 // Timezone Việt Nam: UTC+7
 // 18:35 giờ VN = 11:35 UTC
 
 console.log('🕐 Lottery Scheduler Started');
 console.log('📅 Scheduled: 18:35 daily (Vietnam time / UTC+7)');
+console.log('📊 Auto-evaluate: 18:40 daily');
 console.log('');
 
 // Hàm cập nhật kết quả từ API và lưu database
@@ -87,6 +89,63 @@ cron.schedule('45 11 * * *', async () => {
     } catch (error) {
       console.error(`❌ Backup failed: ${error.message}`);
     }
+  }
+}, {
+  timezone: 'UTC'
+});
+
+// Tự động đánh giá dự đoán lúc 18:40 (sau khi có kết quả)
+cron.schedule('40 11 * * *', async () => {
+  const now = new Date();
+  const vnTime = new Date(now.getTime() + (7 * 60 * 60 * 1000));
+  
+  console.log('');
+  console.log('='.repeat(50));
+  console.log(`📊 [${vnTime.toLocaleString('vi-VN')}] Auto-evaluate predictions`);
+  console.log('='.repeat(50));
+  
+  try {
+    const pending = aiService.getPendingEvaluations();
+    const results = crawlService.getAllResults();
+    let evaluatedCount = 0;
+    
+    // Nhóm theo ngày
+    const pendingByDate = {};
+    for (const p of pending) {
+      if (!pendingByDate[p.date]) {
+        pendingByDate[p.date] = [];
+      }
+      pendingByDate[p.date].push(p);
+    }
+    
+    for (const [date, predictions] of Object.entries(pendingByDate)) {
+      const targetResult = results.find(r => r.date === date);
+      if (targetResult) {
+        const evalResult = aiService.evaluatePrediction(date, targetResult.twoDigits);
+        if (evalResult) {
+          evaluatedCount++;
+          console.log(`✅ Evaluated ${date}:`);
+          for (const [model, result] of Object.entries(evalResult)) {
+            const status = result.isWin ? '🎉 WIN' : '❌ LOSE';
+            console.log(`   ${model}: ${result.hits.join(', ') || 'no hits'} ${status}`);
+          }
+        }
+      }
+    }
+    
+    if (evaluatedCount === 0) {
+      console.log('ℹ️ No pending evaluations');
+    } else {
+      // Hiển thị thống kê tổng hợp
+      const stats = aiService.getModelStatistics();
+      console.log('');
+      console.log('📈 Current Win Rates:');
+      for (const [model, stat] of Object.entries(stats)) {
+        console.log(`   ${model}: ${stat.winRate}% (${stat.wins}/${stat.totalDays})`);
+      }
+    }
+  } catch (error) {
+    console.error(`❌ Auto-evaluate failed: ${error.message}`);
   }
 }, {
   timezone: 'UTC'

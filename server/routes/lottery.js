@@ -394,4 +394,159 @@ router.get('/ai-providers', (req, res) => {
   }
 });
 
+// Lấy thống kê tỉ lệ win của tất cả models
+router.get('/model-statistics', (req, res) => {
+  try {
+    const statistics = aiService.getModelStatistics();
+    res.json({
+      success: true,
+      data: statistics
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Lấy thống kê chi tiết của một model
+router.get('/model-statistics/:modelKey', (req, res) => {
+  try {
+    const { modelKey } = req.params;
+    const stats = aiService.getModelDetailedStats(modelKey);
+    
+    if (!stats) {
+      return res.status(404).json({
+        success: false,
+        error: `Không tìm thấy thống kê cho model ${modelKey}`
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Đánh giá dự đoán với kết quả thực tế
+router.post('/evaluate-predictions', (req, res) => {
+  try {
+    const { date } = req.body;
+    
+    // Lấy kết quả thực tế từ database
+    const results = crawlService.getAllResults();
+    const targetResult = results.find(r => r.date === date);
+    
+    if (!targetResult) {
+      return res.status(404).json({
+        success: false,
+        error: `Không tìm thấy kết quả xổ số ngày ${date}`
+      });
+    }
+    
+    const evaluationResults = aiService.evaluatePrediction(date, targetResult.twoDigits);
+    
+    if (!evaluationResults) {
+      return res.status(404).json({
+        success: false,
+        error: `Không có dự đoán nào cho ngày ${date}`
+      });
+    }
+    
+    res.json({
+      success: true,
+      date: date,
+      actualNumbers: targetResult.twoDigits,
+      data: evaluationResults
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Lấy lịch sử dự đoán
+router.get('/prediction-history', (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const history = aiService.getPredictionHistory(days);
+    res.json({
+      success: true,
+      data: history
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Lấy danh sách dự đoán chưa được đánh giá
+router.get('/pending-evaluations', (req, res) => {
+  try {
+    const pending = aiService.getPendingEvaluations();
+    res.json({
+      success: true,
+      data: pending
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Tự động đánh giá tất cả dự đoán chưa được đánh giá
+router.post('/auto-evaluate', (req, res) => {
+  try {
+    const pending = aiService.getPendingEvaluations();
+    const results = crawlService.getAllResults();
+    const evaluated = [];
+    
+    // Nhóm theo ngày
+    const pendingByDate = {};
+    for (const p of pending) {
+      if (!pendingByDate[p.date]) {
+        pendingByDate[p.date] = [];
+      }
+      pendingByDate[p.date].push(p);
+    }
+    
+    for (const [date, predictions] of Object.entries(pendingByDate)) {
+      const targetResult = results.find(r => r.date === date);
+      if (targetResult) {
+        const evalResult = aiService.evaluatePrediction(date, targetResult.twoDigits);
+        if (evalResult) {
+          evaluated.push({
+            date: date,
+            results: evalResult
+          });
+        }
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: `Đã đánh giá ${evaluated.length} ngày`,
+      data: evaluated
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

@@ -9,6 +9,8 @@ const DEFAULT_MODEL = process.env.DEFAULT_AI_MODEL || 'gemini-claude-opus-4-5-th
 
 // File lưu cache dự đoán
 const PREDICTION_CACHE_FILE = path.join(__dirname, '../data/predictions-cache.json');
+// File lưu lịch sử dự đoán và thống kê
+const PREDICTION_HISTORY_FILE = path.join(__dirname, '../data/predictions-history.json');
 
 // Danh sách models có sẵn
 const AVAILABLE_MODELS = {
@@ -92,6 +94,89 @@ function savePredictionCache(cache) {
   } catch (e) {
     console.error('[Cache] Error saving:', e.message);
   }
+}
+
+// Đọc lịch sử dự đoán
+function readPredictionHistory() {
+  try {
+    if (fs.existsSync(PREDICTION_HISTORY_FILE)) {
+      const data = fs.readFileSync(PREDICTION_HISTORY_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (e) {
+    console.error('[History] Error reading:', e.message);
+  }
+  return { predictions: {}, statistics: {} };
+}
+
+// Lưu lịch sử dự đoán
+function savePredictionHistory(history) {
+  try {
+    const dir = path.dirname(PREDICTION_HISTORY_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(PREDICTION_HISTORY_FILE, JSON.stringify(history, null, 2));
+  } catch (e) {
+    console.error('[History] Error saving:', e.message);
+  }
+}
+
+// Trích xuất các số dự đoán từ text phân tích
+function extractPredictedNumbers(analysisText) {
+  const numbers = [];
+  // Tìm pattern: Lô [XX] hoặc Lô XX
+  const patterns = [
+    /Lô\s*\[(\d{2})\]/gi,
+    /Lô\s+(\d{2})/gi,
+    /\*\*(\d{2})\*\*/g
+  ];
+  
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(analysisText)) !== null) {
+      const num = match[1].padStart(2, '0');
+      if (!numbers.includes(num) && num.length === 2) {
+        numbers.push(num);
+      }
+    }
+  }
+  
+  // Chỉ lấy 3 số đầu tiên
+  return numbers.slice(0, 3);
+}
+
+// Lưu dự đoán cuối cùng trong ngày vào history
+function saveFinalPrediction(modelKey, prediction) {
+  const history = readPredictionHistory();
+  const date = prediction.predictionDate;
+  
+  if (!history.predictions[date]) {
+    history.predictions[date] = {};
+  }
+  
+  // Trích xuất các số dự đoán
+  const predictedNumbers = extractPredictedNumbers(prediction.analysis);
+  
+  history.predictions[date][modelKey] = {
+    model: prediction.model,
+    modelId: prediction.modelId,
+    modelKey: modelKey,
+    predictedNumbers: predictedNumbers,
+    analysis: prediction.analysis,
+    timestamp: prediction.timestamp,
+    evaluated: false,
+    result: null
+  };
+  
+  // Giữ lại 90 ngày gần nhất
+  const dates = Object.keys(history.predictions).sort().reverse();
+  if (dates.length > 90) {
+    dates.slice(90).forEach(d => delete history.predictions[d]);
+  }
+  
+  savePredictionHistory(history);
+  console.log(`[History] Saved final prediction for ${modelKey} on ${date}: [${predictedNumbers.join(', ')}]`);
 }
 
 // Kiểm tra xem model đã dự đoán hôm nay chưa
@@ -261,6 +346,9 @@ async function analyze(statisticsData, modelKey = 'claude-opus') {
   // Lưu vào cache
   cachePrediction(modelKey, prediction);
   
+  // Lưu vào history (dự đoán cuối cùng trong ngày)
+  saveFinalPrediction(modelKey, prediction);
+  
   return prediction;
 }
 
@@ -287,6 +375,177 @@ function clearTodayCache(modelKey = null) {
   savePredictionCache(cache);
 }
 
+// Đánh giá dự đoán dựa trên kết quả thực tế
+function evaluatePrediction(date, actualNumbers) {
+  const history = readPredictionHistory();
+  
+  if (!history.predictions[date]) {
+    console.log(`[Evaluate] No predictions found for ${date}`);
+    return null;
+  }
+  
+  const results = {};
+  
+  for (const [modelKey, prediction] of Object.entries(history.predictions[date])) {
+    if (prediction.evaluated) {
+      results[modelKey] = prediction.result;
+      continue;
+    }
+    
+    const predictedNumbers = prediction.predictedNumbers || [];
+    const hits = predictedNumbers.filter(num => actualNumbers.includes(num));
+    
+    const result = {
+      predictedNumbers: predictedNumbers,
+      hits: hits,
+      hitCount: hits.length,
+      totalPredicted: predictedNumbers.length,
+      actualNumbers: actualNumbers,
+      isWin: hits.length > 0
+    };
+    
+    // Cập nhật kết quả
+    history.predictions[date][modelKey].evaluated = true;
+    history.predictions[date][modelKey].result = result;
+    
+    results[modelKey] = result;
+    console.log(`[Evaluate] ${modelKey} on ${date}: ${hits.length}/${predictedNumbers.length} hits - ${hits.length > 0 ? 'WIN' : 'LOSE'}`);
+  }
+  
+  // Cập nhật thống kê tổng hợp
+  updateStatistics(history);
+  savePredictionHistory(history);
+  
+  return results;
+}
+
+// Cập nhật thống kê tổng hợp theo model
+function updateStatistics(history) {
+  const stats = {};
+  
+  for (const [date, predictions] of Object.entries(history.predictions)) {
+    for (const [modelKey, prediction] of Object.entries(predictions)) {
+      if (!prediction.evaluated || !prediction.result) continue;
+      
+      if (!stats[modelKey]) {
+        stats[modelKey] = {
+          totalDays: 0,
+          wins: 0,
+          losses: 0,
+          totalHits: 0,
+          totalPredicted: 0,
+          winRate: 0,
+          hitRate: 0,
+          history: []
+        };
+      }
+      
+      stats[modelKey].totalDays++;
+      if (prediction.result.isWin) {
+        stats[modelKey].wins++;
+      } else {
+        stats[modelKey].losses++;
+      }
+      stats[modelKey].totalHits += prediction.result.hitCount;
+      stats[modelKey].totalPredicted += prediction.result.totalPredicted;
+      
+      // Lưu lịch sử gần đây (10 ngày)
+      if (stats[modelKey].history.length < 10) {
+        stats[modelKey].history.push({
+          date: date,
+          predicted: prediction.predictedNumbers,
+          hits: prediction.result.hits,
+          isWin: prediction.result.isWin
+        });
+      }
+    }
+  }
+  
+  // Tính tỷ lệ
+  for (const modelKey of Object.keys(stats)) {
+    if (stats[modelKey].totalDays > 0) {
+      stats[modelKey].winRate = Math.round((stats[modelKey].wins / stats[modelKey].totalDays) * 100);
+    }
+    if (stats[modelKey].totalPredicted > 0) {
+      stats[modelKey].hitRate = Math.round((stats[modelKey].totalHits / stats[modelKey].totalPredicted) * 100);
+    }
+    // Sắp xếp history theo ngày mới nhất
+    stats[modelKey].history.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+  
+  history.statistics = stats;
+}
+
+// Lấy thống kê của tất cả models
+function getModelStatistics() {
+  const history = readPredictionHistory();
+  return history.statistics || {};
+}
+
+// Lấy thống kê chi tiết của một model
+function getModelDetailedStats(modelKey) {
+  const history = readPredictionHistory();
+  const stats = history.statistics[modelKey] || null;
+  
+  if (!stats) return null;
+  
+  // Lấy thêm lịch sử chi tiết
+  const detailedHistory = [];
+  for (const [date, predictions] of Object.entries(history.predictions)) {
+    if (predictions[modelKey] && predictions[modelKey].evaluated) {
+      detailedHistory.push({
+        date: date,
+        predicted: predictions[modelKey].predictedNumbers,
+        result: predictions[modelKey].result
+      });
+    }
+  }
+  
+  detailedHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  return {
+    ...stats,
+    detailedHistory: detailedHistory.slice(0, 30)
+  };
+}
+
+// Lấy tất cả dự đoán chưa được đánh giá
+function getPendingEvaluations() {
+  const history = readPredictionHistory();
+  const pending = [];
+  
+  for (const [date, predictions] of Object.entries(history.predictions)) {
+    for (const [modelKey, prediction] of Object.entries(predictions)) {
+      if (!prediction.evaluated) {
+        pending.push({
+          date: date,
+          modelKey: modelKey,
+          predictedNumbers: prediction.predictedNumbers
+        });
+      }
+    }
+  }
+  
+  return pending;
+}
+
+// Lấy lịch sử dự đoán
+function getPredictionHistory(days = 30) {
+  const history = readPredictionHistory();
+  const result = [];
+  
+  const sortedDates = Object.keys(history.predictions).sort().reverse().slice(0, days);
+  
+  for (const date of sortedDates) {
+    result.push({
+      date: date,
+      models: history.predictions[date]
+    });
+  }
+  
+  return result;
+}
+
 // Lấy danh sách models
 function getAvailableProviders() {
   const today = getTodayDateVN();
@@ -308,5 +567,11 @@ module.exports = {
   getTodayPredictions,
   clearTodayCache,
   createAnalysisPrompt,
+  evaluatePrediction,
+  getModelStatistics,
+  getModelDetailedStats,
+  getPendingEvaluations,
+  getPredictionHistory,
+  extractPredictedNumbers,
   AVAILABLE_MODELS
 };
