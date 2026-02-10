@@ -15,8 +15,8 @@ const PREDICTION_HISTORY_FILE = path.join(__dirname, '../data/predictions-histor
 // Danh sách models có sẵn
 const AVAILABLE_MODELS = {
   'claude-opus': {
-    id: 'gemini-claude-opus-4-5-thinking',
-    name: 'Claude Opus 4.5 Thinking',
+    id: 'gemini-claude-opus-4-6-thinking',
+    name: 'Claude Opus 4.6 Thinking',
     description: 'Mạnh nhất, phân tích sâu'
   },
   'claude-sonnet': {
