@@ -24,8 +24,8 @@
     },
     "claude-opus": {
       "provider": "vps-ai",
-      "model": "Claude Opus 4.5 Thinking",
-      "modelId": "gemini-claude-opus-4-5-thinking",
+      "model": "Claude Opus 4.6 Thinking",
+      "modelId": "gemini-claude-opus-4-6-thinking",
       "modelKey": "claude-opus",
       "analysis": "### 🎯 3 CẶP SỐ DỰ ĐOÁN HÔM NAY (Thứ Năm, 5 tháng 2, 2026):\n\n**1. Lô [26]** - Gan 15 ngày, đuôi 6 nóng, đầu 2 chuẩn bị chu kỳ về\n\n**2. Lô [50]** - Gan 15 ngày, đầu 5 kết hợp đuôi 0, xác suất phá gan cao\n\n**3. Lô [84]** - Gan 12 ngày, đầu 8 nóng, đuôi 4 đang hot nhất\n\n### 📊 Đầu đuôi gợi ý:\n- Đầu: **8**\n- Đuôi: **4**\n\n### 📈 Độ tin cậy: **68%**\n\n---\n⚠️ *Lưu ý: Xổ số là trò chơi may rủi, chỉ mang tính tham khảo.*",
       "predictionDate": "2026-02-05",

@@ -5,7 +5,7 @@ const path = require('path');
 // VPS AI Provider config
 const VPS_BASE_URL = process.env.VPS_AI_BASE_URL || 'http://194.233.66.68:8317/v1';
 const VPS_API_KEY = process.env.VPS_AI_API_KEY || 'candat';
-const DEFAULT_MODEL = process.env.DEFAULT_AI_MODEL || 'gemini-claude-opus-4-5-thinking';
+const DEFAULT_MODEL = process.env.DEFAULT_AI_MODEL || 'gemini-claude-opus-4-6-thinking';
 
 // File lưu cache dự đoán
 const PREDICTION_CACHE_FILE = path.join(__dirname, '../data/predictions-cache.json');
