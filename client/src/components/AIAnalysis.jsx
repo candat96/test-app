@@ -4,7 +4,7 @@ import { useAIAnalysis } from '../hooks/useLottery';
 
 // Danh sách models VPS AI
 const AI_MODELS = [
-  { id: 'claude-opus', name: '🧠 Claude Opus 4.5', desc: 'Mạnh nhất' },
+  { id: 'claude-opus', name: '🧠 Claude Opus 4.6', desc: 'Mạnh nhất' },
   { id: 'claude-sonnet', name: '⚡ Claude Sonnet 4.5', desc: 'Nhanh' },
   { id: 'gemini', name: '✨ Gemini 3 Pro', desc: 'Google' },
   { id: 'gpt-codex-max', name: '🤖 GPT 5.1 Max', desc: 'GPT mạnh' },
